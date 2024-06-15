@@ -3,62 +3,131 @@
     <div class="home-top">
       <h1>经纬工作室</h1>
       <canvas ref="canvas" class="message-canvas"></canvas>
+      <el-dialog v-model="dialogStore.showAddMessageDialog" title="添加留言" width="500">
+        <form @submit.prevent="addMessage">
+          <el-form :model="messageForm" :rules="messageFormRules" label-width="80px">
+            <el-form-item label="用户名" prop="username">
+              <el-input v-model="messageForm.username" placeholder="用户名" required></el-input>
+            </el-form-item>
+            <el-form-item label="留言内容" prop="message">
+              <el-input v-model="messageForm.messageText" placeholder="留言" required></el-input>
+            </el-form-item>
+            <el-form-item label="字体" prop="font">
+              <el-input v-model="messageForm.fontName" placeholder="字体 (默认 Arial)"></el-input>
+            </el-form-item>
+            <el-form-item label="颜色" prop="color">
+              <el-input v-model="messageForm.fontColor" type="color" placeholder="颜色"></el-input>
+            </el-form-item>
+          </el-form>
+        </form>
+        <template #footer>
+          <div class="dialog-footer">
+            <el-button @click="dialogStore.closeAddMessageDialog()">取消</el-button>
+            <el-button type="primary" @click="addMessage">添加留言</el-button>
+          </div>
+        </template>
+      </el-dialog>
     </div>
+    <recently />
+    <team-member />
+    <WorkShow />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-
+import { ref, onMounted } from 'vue'
+import { useDialogStore } from '@/store/dialog'
+import recently from './c-cpns/recently.vue'
+import TeamMember from './c-cpns/TeamMember.vue'
+import WorkShow from './c-cpns/WorksShow.vue'
 const canvas = ref<HTMLCanvasElement | null>(null)
 let ctx: CanvasRenderingContext2D | null = null
+
+const messages = ref<
+  { username: string; messageText: string; fontName: string; fontColor: string }[]
+>([
+  { username: '用户1', messageText: '这是第一条留言', fontName: 'Arial', fontColor: 'red' },
+  { username: '用户2', messageText: '这是第二条留言', fontName: 'Arial', fontColor: 'blue' },
+  { username: '用户3', messageText: '这是第三条留言', fontName: 'Arial', fontColor: 'green' },
+  { username: '用户4', messageText: '这是第四条留言', fontName: 'Arial', fontColor: 'purple' },
+  { username: '用户5', messageText: '这是第五条留言', fontName: 'Arial', fontColor: 'orange' }
+])
+
+const dialogStore = useDialogStore()
+
+const defaultFontSize = '20px'
+const defaultFont = 'Arial'
+const messagePositions: { x: number; y: number; speed: number }[] = []
+
+const messageForm = ref({
+  username: '',
+  messageText: '',
+  fontName: '',
+  fontColor: ''
+})
+
+const messageFormRules = {
+  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  messageText: [{ required: true, message: '请输入留言内容', trigger: 'blur' }]
+}
+const addMessage = () => {
+  const { username, messageText, fontName, fontColor } = messageForm.value
+  messages.value.push({ username, messageText, fontName, fontColor })
+  dialogStore.closeAddMessageDialog()
+  messageForm.value = {
+    username: '',
+    messageText: '',
+    fontName: '',
+    fontColor: ''
+  }
+  drawMessages()
+}
 
 onMounted(() => {
   if (canvas.value) {
     ctx = canvas.value.getContext('2d')
     if (ctx) {
-      startScroll()
+      canvas.value.width = 1600
+      canvas.value.height = 800
+      drawMessages()
     }
   }
 })
 
-function startScroll() {
-  const messages = [
-    '这是第一条留言',
-    '这是第二条留言',
-    '这是第三条留言',
-    '这是第四条留言',
-    '这是第五条留言'
-  ]
+function drawMessages() {
+  if (!ctx || !canvas.value) return
 
-  let yPos = 100 // 初始留言的垂直位置
-  const scrollSpeed = 1 // 滚动速度
+  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height)
 
-  function drawMessages() {
-    if (!ctx) return
+  messages.value.forEach((message, i) => {
+    const { username, messageText, fontName, fontColor } = message
+    let messagePosition = messagePositions[i]
 
-    ctx.clearRect(0, 0, canvas.value!.width, canvas.value!.height)
-
-    ctx.font = '20px Arial'
-    ctx.fillStyle = 'black'
-
-    messages.forEach((message, index) => {
-      const y = yPos + index * 30 // 每条留言之间的垂直间隔
-      ctx.fillText(message, 10, y)
-    })
-
-    yPos -= scrollSpeed
-
-    // 当第一条留言超出画布时，将其移到最后一条留言之后
-    const messageHeight = 30 // 留言高度
-    if (yPos < -messageHeight) {
-      yPos = messages.length * messageHeight
+    if (!messagePosition) {
+      messagePosition = {
+        x: canvas.value.width,
+        y: Math.random() * canvas.value.height,
+        speed: Math.random() * 2 + 1
+      }
+      messagePositions[i] = messagePosition
     }
 
+    const font = `${defaultFontSize} ${fontName || defaultFont}`
+    ctx.fillStyle = fontColor || 'white'
+    ctx.font = font
+    ctx.fillText(`${username}: ${messageText}`, messagePosition.x, messagePosition.y)
+
+    messagePosition.x -= messagePosition.speed
+
+    if (messagePosition.x < -ctx.measureText(`${username}: ${messageText}`).width) {
+      messagePosition.x = canvas.value.width
+      messagePosition.speed = Math.random() * 2 + 1
+    }
+  })
+
+  if (messages.value.length > 0) {
     requestAnimationFrame(drawMessages)
   }
-
-  drawMessages()
 }
 </script>
 
@@ -90,10 +159,19 @@ h1 {
 }
 
 .message-canvas {
-  position: absolute;
-  bottom: 50px;
-  left: 0;
-  width: 100%;
-  height: 200px; /* 调整画布高度 */
+  display: block;
+  position: relative;
+  top: -190px;
+}
+
+form {
+  margin-top: 20px;
+}
+
+input,
+button {
+  margin: 5px;
+  padding: 10px;
+  font-size: 16px;
 }
 </style>

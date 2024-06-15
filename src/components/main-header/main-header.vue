@@ -20,15 +20,22 @@
       <el-menu-item index="teacher">指导老师</el-menu-item>
     </el-sub-menu>
     <el-menu-item index="homework">作品展示</el-menu-item>
-    <el-menu-item>留言</el-menu-item>
+    <el-menu-item @click="openAddMessageDialog">留言</el-menu-item>
     <el-menu-item index="join">加入我们</el-menu-item>
   </el-menu>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue'
+import { useDialogStore } from '@/store/dialog'
 
-const activeIndex = ref('1')
+const dialogStore = useDialogStore()
+
+const openAddMessageDialog = () => {
+  dialogStore.openAddMessageDialog()
+}
+
+const activeIndex = ref('home')
 const handleSelect = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }
