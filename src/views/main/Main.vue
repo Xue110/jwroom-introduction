@@ -23,7 +23,11 @@ import MainFooter from '@/components/main-footer/main-footer.vue'
 }
 
 .main-content {
-  height: 100%;
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   .el-main {
     background-color: #f0f2f5;
   }

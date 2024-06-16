@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeft, ArrowRight, MessageBox, PieChart, User } from '@element-plus/icons-vue'
+import { ArrowLeft, ArrowRight, MessageBox, User } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -139,6 +139,10 @@ const images = ref<Image[]>([
 const imageWidth = 200 // 图片宽度
 const gap = 50 // 图片之间的间隙
 const currentIndex = ref(0) // 当前显示的第一个图片的索引
+
+setInterval(() => {
+  next()
+}, 2000)
 
 const next = () => {
   if (currentIndex.value < images.value.length - 5) {
@@ -263,7 +267,7 @@ const prev = () => {
   .carousel-item {
     min-width: 200px;
     height: 200px;
-    margin-right: 110px; /* 设置图片之间的间隙 */
+    margin-right: 120px; /* 设置图片之间的间隙 */
     overflow: hidden;
   }
   .carousel-item img {

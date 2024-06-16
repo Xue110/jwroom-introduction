@@ -6,9 +6,11 @@
         <img width="20%" src="@/assets/img/LOGO2.png" alt="经纬" />
       </div>
       <div class="approval-number">
-        <span>网站备案号：</span>
+        <span><img style="width: 15px" src="@/assets/img/police.png" alt="" /> 吉公网安备：</span>
         <span>{{ approvalNumber }}</span>
       </div>
+      <div>© 2024 北华大学经纬工作室 版权所有</div>
+      <div>技术支持：经纬工作室 润石工作室</div>
     </div>
   </div>
 </template>
@@ -29,7 +31,10 @@ const approvalNumber = ref('吉ICP备2024015968号')
 }
 
 .footer-content {
+  font-size: 12px;
+  flex: 1;
   display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 </style>
