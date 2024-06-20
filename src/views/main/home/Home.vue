@@ -40,18 +40,13 @@ import { useDialogStore } from '@/store/dialog'
 import recently from './c-cpns/recently.vue'
 import TeamMember from './c-cpns/TeamMember.vue'
 import WorkShow from './c-cpns/WorksShow.vue'
+import usemessageStore from '@/store/main/home/message'
+import { storeToRefs } from 'pinia'
+import { ElMessage } from 'element-plus'
 const canvas = ref<HTMLCanvasElement | null>(null)
 let ctx: CanvasRenderingContext2D | null = null
 
-const messages = ref<
-  { username: string; messageText: string; fontName: string; fontColor: string }[]
->([
-  { username: '用户1', messageText: '这是第一条留言', fontName: 'Arial', fontColor: 'red' },
-  { username: '用户2', messageText: '这是第二条留言', fontName: 'Arial', fontColor: 'blue' },
-  { username: '用户3', messageText: '这是第三条留言', fontName: 'Arial', fontColor: 'green' },
-  { username: '用户4', messageText: '这是第四条留言', fontName: 'Arial', fontColor: 'purple' },
-  { username: '用户5', messageText: '这是第五条留言', fontName: 'Arial', fontColor: 'orange' }
-])
+const useMessageStore = usemessageStore()
 
 const dialogStore = useDialogStore()
 
@@ -70,9 +65,11 @@ const messageFormRules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   messageText: [{ required: true, message: '请输入留言内容', trigger: 'blur' }]
 }
-const addMessage = () => {
+
+const addMessage = async () => {
   const { username, messageText, fontName, fontColor } = messageForm.value
-  messages.value.push({ username, messageText, fontName, fontColor })
+  await useMessageStore.fetchPostMessageAction({ username, messageText, fontName, fontColor })
+  ElMessage.success('留言成功')
   dialogStore.closeAddMessageDialog()
   messageForm.value = {
     username: '',
@@ -87,7 +84,7 @@ onMounted(() => {
   if (canvas.value) {
     ctx = canvas.value.getContext('2d')
     if (ctx) {
-      canvas.value.width = 1600
+      canvas.value.width = 1650
       canvas.value.height = 800
       drawMessages()
     }
@@ -98,8 +95,9 @@ function drawMessages() {
   if (!ctx || !canvas.value) return
 
   ctx.clearRect(0, 0, canvas.value.width, canvas.value.height)
-
-  messages.value.forEach((message, i) => {
+  useMessageStore.fetchGetMessageAction()
+  const { entiremessage } = storeToRefs(useMessageStore)
+  entiremessage.value.forEach((message, i) => {
     const { username, messageText, fontName, fontColor } = message
     let messagePosition = messagePositions[i]
 
@@ -125,9 +123,7 @@ function drawMessages() {
     }
   })
 
-  if (messages.value.length > 0) {
-    requestAnimationFrame(drawMessages)
-  }
+  requestAnimationFrame(drawMessages)
 }
 </script>
 
@@ -161,7 +157,7 @@ h1 {
 .message-canvas {
   display: block;
   position: relative;
-  top: -190px;
+  top: -150px;
 }
 
 form {

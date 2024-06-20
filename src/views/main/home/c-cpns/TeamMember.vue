@@ -34,8 +34,8 @@
         class="carousel-track"
         :style="{ transform: `translateX(-${currentIndex * (imageWidth + gap)}px)` }"
       >
-        <div class="carousel-item" v-for="(image, index) in images" :key="index">
-          <img :src="image.src" :alt="`Image ${index + 1}`" />
+        <div class="carousel-item" v-for="(image, index) in entireNewMember" :key="index">
+          <img :src="image.avatar" :alt="`Image ${index + 1}`" />
           <div class="introduce">
             <h2>
               <el-icon><User /></el-icon> {{ image.name }}
@@ -45,7 +45,7 @@
                 <el-icon><Clock /></el-icon> 加入时间：{{ image.time }}
               </p>
               <p style="margin-top: 7px">
-                <el-icon><MessageBox /></el-icon> 职位：{{ image.work }}
+                <el-icon><MessageBox /></el-icon> 职位：{{ image.job }}
               </p>
             </div>
           </div>
@@ -56,16 +56,11 @@
 </template>
 
 <script setup lang="ts">
+import useNewMemberStore from '@/store/main/home/newMember'
 import { ArrowLeft, ArrowRight, MessageBox, User } from '@element-plus/icons-vue'
+import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-
-interface Image {
-  src: string
-  name: string
-  time: string
-  work: string
-}
 
 const router = useRouter()
 
@@ -73,70 +68,11 @@ const pushrouter = () => {
   router.push('/teams')
 }
 
-const images = ref<Image[]>([
-  {
-    src: 'https://photo.16pic.com/00/86/66/16pic_8666236_b.jpg',
-    name: '测试员1',
-    time: '测试时间1',
-    work: '测试岗位1'
-  },
-  {
-    src: 'https://photo.16pic.com/00/86/66/16pic_8666236_b.jpg',
-    name: '测试员1',
-    time: '测试时间1',
-    work: '测试岗位1'
-  },
-  {
-    src: 'https://photo.16pic.com/00/86/66/16pic_8666236_b.jpg',
-    name: '测试员1',
-    time: '测试时间1',
-    work: '测试岗位1'
-  },
-  {
-    src: 'https://photo.16pic.com/00/86/66/16pic_8666236_b.jpg',
-    name: '测试员1',
-    time: '测试时间1',
-    work: '测试岗位1'
-  },
-  {
-    src: 'https://photo.16pic.com/00/86/66/16pic_8666236_b.jpg',
-    name: '测试员1',
-    time: '测试时间1',
-    work: '测试岗位1'
-  },
-  {
-    src: 'https://photo.16pic.com/00/86/66/16pic_8666236_b.jpg',
-    name: '测试员1',
-    time: '测试时间1',
-    work: '测试岗位1'
-  },
-  {
-    src: 'https://photo.16pic.com/00/86/66/16pic_8666236_b.jpg',
-    name: '测试员1',
-    time: '测试时间1',
-    work: '测试岗位1'
-  },
-  {
-    src: 'https://photo.16pic.com/00/86/66/16pic_8666236_b.jpg',
-    name: '测试员1',
-    time: '测试时间1',
-    work: '测试岗位1'
-  },
-  {
-    src: 'https://photo.16pic.com/00/86/66/16pic_8666236_b.jpg',
-    name: '测试员1',
-    time: '测试时间1',
-    work: '测试岗位1'
-  },
-  {
-    src: 'https://photo.16pic.com/00/86/66/16pic_8666236_b.jpg',
-    name: '测试员1',
-    time: '测试时间1',
-    work: '测试岗位1'
-  }
-])
+const useStore = useNewMemberStore()
+useStore.fetchNewMemberAction()
+const { entireNewMember } = storeToRefs(useStore)
 
-const imageWidth = 200 // 图片宽度
+const imageWidth = 250 // 图片宽度
 const gap = 50 // 图片之间的间隙
 const currentIndex = ref(0) // 当前显示的第一个图片的索引
 
@@ -145,7 +81,7 @@ setInterval(() => {
 }, 2000)
 
 const next = () => {
-  if (currentIndex.value < images.value.length - 5) {
+  if (currentIndex.value < entireNewMember.value.length - 5) {
     currentIndex.value++
   } else {
     currentIndex.value = 0 // 如果达到最后一组图片，则回到开头
@@ -156,7 +92,7 @@ const prev = () => {
   if (currentIndex.value > 0) {
     currentIndex.value--
   } else {
-    currentIndex.value = Math.max(images.value.length - 5, 0) // 如果到达最前面，则跳到最后一组图片
+    currentIndex.value = Math.max(entireNewMember.value.length - 5, 0) // 如果到达最前面，则跳到最后一组图片
   }
 }
 </script>

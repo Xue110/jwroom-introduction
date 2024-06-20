@@ -9,8 +9,8 @@
     </div>
     <div class="main">
       <el-carousel :interval="4000" type="card" height="300px">
-        <el-carousel-item v-for="item in 6" :key="item">
-          <h3 text="2xl" justify="center">{{ item }}</h3>
+        <el-carousel-item v-for="item in entireFineWorks" :key="item">
+          <a :href="item.link" target="_blank"><img :src="item.src" alt="item.title" /></a>
         </el-carousel-item>
       </el-carousel>
       <p @click="$router.push('/homework')">查看更多</p>
@@ -18,7 +18,14 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import useFineWorksStore from '@/store/main/home/fineWorks'
+import { storeToRefs } from 'pinia'
+
+const useStore = useFineWorksStore()
+useStore.fetchFineWorksAction()
+const { entireFineWorks } = storeToRefs(useStore)
+</script>
 
 <style lang="less" scoped>
 .works-show {
@@ -84,6 +91,10 @@
       cursor: pointer;
       margin: auto;
       margin-top: 20px;
+    }
+    img {
+      width: 100%;
+      height: 100%;
     }
   }
 }

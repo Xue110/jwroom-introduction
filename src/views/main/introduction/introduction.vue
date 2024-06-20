@@ -14,55 +14,46 @@
     </div>
     <div class="image">
       <ul class="photo">
-        <li v-for="(photo, index) in photos" :key="index">
-          <a href="#" @click.prevent="handleClick(photo.title)" :title="photo.title"
-            ><img :src="photo.url" :alt="photo.title"
-          /></a>
+        <li v-for="(photo, index) in entireintroduce" :key="index">
+          <a href="#" @click.prevent="handleClick(photo)" :title="photo.title">
+            <img :src="photo.img" :alt="photo.title" />
+          </a>
         </li>
       </ul>
     </div>
+    <el-drawer v-model="drawer" title="详细介绍" :with-header="false" show-close>
+      <h3 style="margin-bottom: 20px">{{ title }}</h3>
+      <span style="font-family: '楷体'; font-size: 18px; line-height: 30px; text-indent: 2em">{{
+        content
+      }}</span>
+      <img :src="currentImage" alt="当前图片" style="max-width: 100%; margin-top: 10px" />
+    </el-drawer>
   </div>
 </template>
 
 <script setup lang="ts">
-const photos = [
-  {
-    url: 'https://img2.baidu.com/it/u=4025585990,2156099009&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1718643600&t=42460baf2b183f067135b2adbe1de205',
-    title: 'Happy day'
-  },
-  {
-    url: 'https://img2.baidu.com/it/u=4025585990,2156099009&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1718643600&t=42460baf2b183f067135b2adbe1de205',
-    title: 'Happy day'
-  },
-  {
-    url: 'https://img2.baidu.com/it/u=4025585990,2156099009&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1718643600&t=42460baf2b183f067135b2adbe1de205',
-    title: 'Happy day'
-  },
-  {
-    url: 'https://img2.baidu.com/it/u=4025585990,2156099009&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1718643600&t=42460baf2b183f067135b2adbe1de205',
-    title: 'Happy day'
-  },
-  {
-    url: 'https://img2.baidu.com/it/u=4025585990,2156099009&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1718643600&t=42460baf2b183f067135b2adbe1de205',
-    title: 'Happy day'
-  },
-  {
-    url: 'https://img2.baidu.com/it/u=4025585990,2156099009&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1718643600&t=42460baf2b183f067135b2adbe1de205',
-    title: 'Happy day'
-  },
-  {
-    url: 'https://img2.baidu.com/it/u=4025585990,2156099009&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1718643600&t=42460baf2b183f067135b2adbe1de205',
-    title: 'Happy day'
-  },
-  {
-    url: 'https://img2.baidu.com/it/u=4025585990,2156099009&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1718643600&t=42460baf2b183f067135b2adbe1de205',
-    title: 'Happy day'
-  }
-]
+import useIntroduceStore from '@/store/main/introduce/introduce'
+import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
 
-const handleClick = (title: string) => {
-  // 处理点击事件的逻辑
-  alert('您正在查看的图片是：' + title)
+// 初始化状态
+const drawer = ref(false)
+const title = ref('')
+const content = ref('')
+const currentImage = ref('')
+
+// 获取数据
+const useStore = useIntroduceStore()
+useStore.fetchIntroduceAction()
+
+const { entireintroduce } = storeToRefs(useStore)
+
+// 点击处理逻辑
+const handleClick = (photo: { title: string; img: string; content: string }) => {
+  title.value = photo.title
+  content.value = photo.content
+  currentImage.value = photo.img
+  drawer.value = true
 }
 </script>
 

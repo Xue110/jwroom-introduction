@@ -10,51 +10,49 @@
       <div class="activity-container">
         <div class="activity-boxes">
           <div
-            v-for="(activity, index) in activities"
+            v-for="(activity, index) in entireRecently"
             :key="index"
             class="activity-box"
-            @mouseover="setCurrentImage(activity.image)"
+            @mouseover="setCurrentimg(activity.img)"
             @mouseenter="handleMouseEnter(index)"
             @mouseleave="handleMouseLeave"
             :class="{ active: hoveredBoxIndex === index }"
           >
-            {{ activity.name }}
+            {{ activity.title }}
           </div>
         </div>
       </div>
     </div>
     <div class="right">
       <transition name="fade" mode="out-in">
-        <img :key="currentImage" :src="currentImage" class="activity-image" alt="Activity Image" />
+        <img :key="currentimg" :src="currentimg" class="activity-img" alt="Activity img" />
       </transition>
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
-import { ref } from 'vue'
+import useRecentlyStore from '@/store/main/home/recently'
+import { storeToRefs } from 'pinia'
+import { ref, watchEffect } from 'vue'
 
-// Importing images using import statements
-import bg4Img from '@/assets/img/bg4.png'
-import logo2Img from '@/assets/img/LOGO2.png'
-import logoImg from '@/assets/img/logo.png'
+const useStore = useRecentlyStore()
+useStore.fetchRecentlyAction()
+const { entireRecently } = storeToRefs(useStore)
 
-interface Activity {
-  name: string
-  image: string
-}
+const currentimg = ref<string>('')
 
-const activities: Activity[] = [
-  { name: '活动一', image: bg4Img },
-  { name: '活动二', image: logo2Img },
-  { name: '活动三', image: bg4Img },
-  { name: '活动四', image: logoImg }
-]
+// 等待数据加载完成后再初始化 currentimg
+watchEffect(() => {
+  if (entireRecently.value.length > 0) {
+    currentimg.value = entireRecently.value[0].img
+  }
+})
 
-const currentImage = ref<string>(activities[0].image)
 let hoveredBoxIndex = ref<number | null>(null)
 
-function setCurrentImage(image: string) {
-  currentImage.value = image
+function setCurrentimg(img: string) {
+  currentimg.value = img
 }
 
 function handleMouseEnter(index: number) {
@@ -62,7 +60,8 @@ function handleMouseEnter(index: number) {
 }
 
 function handleMouseLeave() {
-  // 不再需要任何操作，因为我们希望悬浮效果保持
+  // 可以根据需要处理鼠标离开事件
+  // 例如保持最后悬停的状态或清空状态
 }
 </script>
 
@@ -159,7 +158,7 @@ function handleMouseLeave() {
     height: 90%;
     padding-top: 50px;
     padding-right: 60px;
-    .activity-image {
+    .activity-img {
       position: absolute;
       top: 150px;
       left: 10px;

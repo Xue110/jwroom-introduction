@@ -103,6 +103,8 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import { ElMessage, type ComponentSize, type FormInstance, type FormRules } from 'element-plus'
+import useJointore from '@/store/main/join/join'
+import { formatUTC } from '@/utils/format'
 
 interface RuleForm {
   name: ''
@@ -142,11 +144,14 @@ const rules = reactive<FormRules<RuleForm>>({
   date: [{ required: false, message: '请选择您的生日', trigger: 'change' }]
 })
 
+const useStore = useJointore()
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
       console.log('submit!', ruleForm)
+      useStore.fetchJoinDataAction(ruleForm)
+      ElMessage.success('提交成功')
     } else {
       ElMessage.error('请填写完整信息')
       console.log('error submit!', fields)
