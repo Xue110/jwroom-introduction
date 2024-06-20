@@ -2,6 +2,19 @@
 
 This template should help get you started developing with Vue 3 in Vite.
 
+## 本系统为经纬工作室介绍
+
+## 项目介绍
+
+本系统为经纬工作室介绍，主要功能为主页，留言， 成员分布，项目展示，加入我们，等等
+
+## 技术栈
+
+- Vue 3
+- Vite
+- TypeScript
+- Element Plus
+
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
